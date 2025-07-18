@@ -3,6 +3,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
 
+// Test route to check if auth routes are working
+router.get('/test', (req, res) => {
+    res.json({ message: 'Auth routes are working!', timestamp: new Date().toISOString() });
+});
+
 const users = [
     {
         id: 1,
