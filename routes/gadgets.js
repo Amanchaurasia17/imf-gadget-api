@@ -24,6 +24,36 @@ const validateGadget = (req, res, next) => {
     next();
 };
 
+router.get('/stats', async (req, res) => {
+    try {
+        const stats = await Gadget.findAll({
+            attributes: [
+                'status',
+                [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+            ],
+            group: ['status']
+        });
+
+        const totalGadgets = await Gadget.count();
+        
+        const formattedStats = {
+            total: totalGadgets,
+            byStatus: stats.reduce((acc, stat) => {
+                acc[stat.status] = parseInt(stat.dataValues.count);
+                return acc;
+            }, {})
+        };
+
+        res.json(formattedStats);
+    } catch (error) {
+        console.error('Stats error:', error);
+        res.status(500).json({
+            error: 'Failed to fetch statistics',
+            message: 'Internal server error'
+        });
+    }
+});
+
 router.get('/stats/summary', async (req, res) => {
     try {
         const stats = await Gadget.findAll({

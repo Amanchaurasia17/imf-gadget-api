@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
                 username: user.username, 
                 role: user.role 
             },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || 'imf-gadget-secret-key-2025',
             { expiresIn: '24h' }
         );
 
@@ -114,7 +114,7 @@ router.post('/register', async (req, res) => {
                 username: newUser.username, 
                 role: newUser.role 
             },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || 'imf-gadget-secret-key-2025',
             { expiresIn: '24h' }
         );
 
@@ -155,7 +155,7 @@ function authenticateToken(req, res, next) {
         });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET || 'imf-gadget-secret-key-2025', (err, user) => {
         if (err) {
             return res.status(403).json({
                 error: 'Invalid token',
