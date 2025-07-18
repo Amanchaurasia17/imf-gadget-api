@@ -22,14 +22,16 @@ const users = [
         id: 1,
         username: 'agent007',
         email: 'james.bond@imf.gov',
-        password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // This is 'password'
+        plainPassword: 'password', // For testing purposes
         role: 'agent'
     },
     {
         id: 2,
         username: 'missioncontrol',
         email: 'control@imf.gov',
-        password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+        password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // This is 'password'
+        plainPassword: 'password', // For testing purposes
         role: 'admin'
     }
 ];
@@ -41,7 +43,11 @@ router.get('/login', (req, res) => {
         expectedBody: {
             username: 'agent007 or james.bond@imf.gov',
             password: 'password'
-        }
+        },
+        testUsers: [
+            { username: 'agent007', password: 'password' },
+            { email: 'james.bond@imf.gov', password: 'password' }
+        ]
     });
 });
 
