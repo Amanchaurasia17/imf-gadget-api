@@ -12,7 +12,7 @@ router.get('/test', (req, res) => {
 router.get('/debug', (req, res) => {
     res.json({ 
         message: 'Debug: Auth routes loaded', 
-        availableRoutes: ['/test', '/debug', '/signin', '/register', '/verify'],
+        availableRoutes: ['/test', '/debug', '/signin', '/signup', '/verify'],
         timestamp: new Date().toISOString() 
     });
 });
@@ -112,7 +112,7 @@ router.post('/signin', async (req, res) => {
     }
 });
 
-router.get('/register', (req, res) => {
+router.get('/signup', (req, res) => {
     res.json({ 
         message: 'Registration endpoint - use POST with username/email/password',
         method: 'POST',
@@ -124,7 +124,7 @@ router.get('/register', (req, res) => {
     });
 });
 
-router.post('/register', async (req, res) => {
+router.post('/signup', async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
