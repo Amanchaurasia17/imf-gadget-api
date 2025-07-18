@@ -17,6 +17,11 @@ router.get('/debug', (req, res) => {
     });
 });
 
+// Simple login test
+router.get('/login-test', (req, res) => {
+    res.json({ message: 'Login test route works!', timestamp: new Date().toISOString() });
+});
+
 const users = [
     {
         id: 1,

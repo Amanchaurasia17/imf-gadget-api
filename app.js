@@ -23,12 +23,6 @@ app.use((req, res, next) => {
     }
 });
 
-// Debug middleware
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.originalUrl}`);
-    next();
-});
-
 
 const gadgetRoutes = require('./routes/gadgets');
 const authRoutes = require('./routes/auth');
