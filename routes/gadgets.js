@@ -32,7 +32,7 @@ router.get('/test-stats', async (req, res) => {
     });
 });
 
-router.get('/stats', async (req, res) => {
+router.get('/statistics', async (req, res) => {
     try {
         const stats = await Gadget.findAll({
             attributes: [

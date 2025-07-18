@@ -8,6 +8,15 @@ router.get('/test', (req, res) => {
     res.json({ message: 'Auth routes are working!', timestamp: new Date().toISOString() });
 });
 
+// Debug route
+router.get('/debug', (req, res) => {
+    res.json({ 
+        message: 'Debug: Auth routes loaded', 
+        availableRoutes: ['/test', '/debug', '/login', '/register', '/verify'],
+        timestamp: new Date().toISOString() 
+    });
+});
+
 const users = [
     {
         id: 1,
