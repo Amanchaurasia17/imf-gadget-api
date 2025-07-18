@@ -20,11 +20,7 @@ module.exports = {
     logging: false, // Disable logging in tests
   },
   production: {
-    username: process.env.DB_USERNAME || process.env.PGUSER,
-    password: process.env.DB_PASSWORD || process.env.PGPASSWORD,
-    database: process.env.DB_NAME || process.env.PGDATABASE,
-    host: process.env.DB_HOST || process.env.PGHOST,
-    port: process.env.DB_PORT || process.env.PGPORT || 5432,
+    use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
     logging: false,
     dialectOptions: {

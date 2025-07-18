@@ -2,6 +2,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // Enable UUID extension if not exists
+    await queryInterface.sequelize.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
+    
     await queryInterface.createTable('Gadgets', {
       id: {
         allowNull: false,

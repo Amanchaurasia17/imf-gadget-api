@@ -32,12 +32,25 @@ app.use('/api/gadgets', gadgetRoutes);
 app.use('/api/auth', authRoutes);
 
 
-app.get('/health', (req, res) => {
-    res.status(200).json({ 
-        status: 'OK', 
-        message: 'IMF Gadget API is running',
-        timestamp: new Date().toISOString()
-    });
+app.get('/health', async (req, res) => {
+    try {
+        // Test database connection
+        await sequelize.authenticate();
+        res.status(200).json({ 
+            status: 'OK', 
+            message: 'IMF Gadget API is running',
+            database: 'Connected',
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        res.status(503).json({ 
+            status: 'ERROR', 
+            message: 'Database connection failed',
+            database: 'Disconnected',
+            error: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 
 app.get('/', (req, res) => {
@@ -80,21 +93,39 @@ const startServer = async () => {
             console.log('🔄 Running database migrations...');
             const { execSync } = require('child_process');
             try {
+                // Ensure migrations table exists first
+                await sequelize.query(`
+                    CREATE TABLE IF NOT EXISTS "SequelizeMeta" (
+                        "name" VARCHAR(255) NOT NULL PRIMARY KEY
+                    );
+                `);
+                
                 execSync('npx sequelize-cli db:migrate', { stdio: 'inherit' });
                 console.log('✅ Database migrations completed successfully.');
                 
                 // Run seeders only if no data exists
-                const gadgetCount = await sequelize.models.Gadget.count();
-                if (gadgetCount === 0) {
-                    console.log('🌱 Seeding database with initial data...');
-                    execSync('npx sequelize-cli db:seed:all', { stdio: 'inherit' });
-                    console.log('✅ Database seeding completed successfully.');
-                } else {
-                    console.log('📊 Database already contains data, skipping seeding.');
+                try {
+                    const gadgetCount = await sequelize.models.Gadget.count();
+                    if (gadgetCount === 0) {
+                        console.log('🌱 Seeding database with initial data...');
+                        execSync('npx sequelize-cli db:seed:all', { stdio: 'inherit' });
+                        console.log('✅ Database seeding completed successfully.');
+                    } else {
+                        console.log('📊 Database already contains data, skipping seeding.');
+                    }
+                } catch (seedError) {
+                    console.log('⚠️ Seeding skipped - table may not exist yet:', seedError.message);
                 }
             } catch (migrationError) {
-                console.error('❌ Database migration/seeding error:', migrationError.message);
-                // Don't exit - let the app start anyway
+                console.error('❌ Database migration error:', migrationError.message);
+                console.log('🔄 Attempting to sync database as fallback...');
+                try {
+                    await sequelize.sync({ force: false, alter: true });
+                    console.log('✅ Database synchronized successfully as fallback.');
+                } catch (syncError) {
+                    console.error('❌ Database sync also failed:', syncError.message);
+                    console.log('🚀 Starting server anyway - some endpoints may not work');
+                }
             }
         } else {
             // Sync database in development
@@ -115,7 +146,7 @@ const startServer = async () => {
         
         return server;
     } catch (error) {
-        console.error(' Unable to start server:', error);
+        console.error('❌ Unable to start server:', error);
         process.exit(1);
     }
 };
