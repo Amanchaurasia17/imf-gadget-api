@@ -25,6 +25,17 @@ const users = [
     }
 ];
 
+router.get('/login', (req, res) => {
+    res.json({ 
+        message: 'Login endpoint - use POST with username/password',
+        method: 'POST',
+        expectedBody: {
+            username: 'agent007 or james.bond@imf.gov',
+            password: 'password'
+        }
+    });
+});
+
 router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -79,6 +90,18 @@ router.post('/login', async (req, res) => {
             message: 'Internal server error'
         });
     }
+});
+
+router.get('/register', (req, res) => {
+    res.json({ 
+        message: 'Registration endpoint - use POST with username/email/password',
+        method: 'POST',
+        expectedBody: {
+            username: 'your_username',
+            email: 'your_email@example.com',
+            password: 'your_password'
+        }
+    });
 });
 
 router.post('/register', async (req, res) => {

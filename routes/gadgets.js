@@ -24,6 +24,14 @@ const validateGadget = (req, res, next) => {
     next();
 };
 
+// Test route to check if stats routing works
+router.get('/test-stats', async (req, res) => {
+    res.json({ 
+        message: 'Stats routing is working!',
+        timestamp: new Date().toISOString()
+    });
+});
+
 router.get('/stats', async (req, res) => {
     try {
         const stats = await Gadget.findAll({
