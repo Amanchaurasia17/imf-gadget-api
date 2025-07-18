@@ -71,22 +71,49 @@ app.use('*', (req, res) => {
 
 const startServer = async () => {
     try {
-        
+        // Test database connection
         await sequelize.authenticate();
-        console.log('Database connection has been established successfully.');
+        console.log('✅ Database connection has been established successfully.');
         
-       
-        if (process.env.NODE_ENV === 'development') {
+        // Run migrations in production (Railway)
+        if (process.env.NODE_ENV === 'production') {
+            console.log('🔄 Running database migrations...');
+            const { execSync } = require('child_process');
+            try {
+                execSync('npx sequelize-cli db:migrate', { stdio: 'inherit' });
+                console.log('✅ Database migrations completed successfully.');
+                
+                // Run seeders only if no data exists
+                const gadgetCount = await sequelize.models.Gadget.count();
+                if (gadgetCount === 0) {
+                    console.log('🌱 Seeding database with initial data...');
+                    execSync('npx sequelize-cli db:seed:all', { stdio: 'inherit' });
+                    console.log('✅ Database seeding completed successfully.');
+                } else {
+                    console.log('📊 Database already contains data, skipping seeding.');
+                }
+            } catch (migrationError) {
+                console.error('❌ Database migration/seeding error:', migrationError.message);
+                // Don't exit - let the app start anyway
+            }
+        } else {
+            // Sync database in development
             await sequelize.sync({ alter: false });
-            console.log(' Database synchronized successfully.');
+            console.log('✅ Database synchronized successfully.');
         }
         
-        // Start server
-        app.listen(PORT, () => {
-            console.log(` IMF Gadget API server is running on port ${PORT}`);
-            console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(` Health check: http://localhost:${PORT}/health`);
+        // Start server (bind to 0.0.0.0 for Railway)
+        const server = app.listen(PORT, '0.0.0.0', () => {
+            console.log(`🚀 IMF Gadget API server is running on port ${PORT}`);
+            console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+            if (process.env.NODE_ENV === 'production') {
+                console.log(`🌐 API available at: ${process.env.RAILWAY_STATIC_URL || 'Railway URL'}`);
+            } else {
+                console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+            }
         });
+        
+        return server;
     } catch (error) {
         console.error(' Unable to start server:', error);
         process.exit(1);
