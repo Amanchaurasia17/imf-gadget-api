@@ -4,6 +4,12 @@
 .env.production
 .env.test
 
+# Sensitive Configuration Files
+config/config.json
+*/config.json
+**/config.json
+config.json
+
 # Dependencies
 node_modules/
 npm-debug.log*
